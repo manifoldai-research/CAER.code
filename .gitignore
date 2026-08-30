@@ -1,0 +1,45 @@
+# Local machine paths (copy from config/paths.env.example)
+config/paths.env
+*.env
+!config/paths.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+env/
+
+# Training / inference artifacts
+outputs/
+runs/
+logs/
+tensorboard/
+*.safetensors
+*.bin
+*.pt
+*.ckpt
+*.pth
+
+# User-supplied assets
+data/
+datasets/
+models/
+checkpoints/
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# Nested archive of this repo (do not commit)
+*.zip
+four-modal-repro.zip

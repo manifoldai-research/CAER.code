@@ -1,0 +1,11 @@
+{
+  "variant": "exp02_chunkwise_4step",
+  "output_root": "outputs/cfpp_tpz0626_exp02_chunkwise_4step",
+  "initializer": "/path/to/checkpoint-10000/diffusion_pytorch_model.safetensors",
+  "modalities": ["camera", "arm", "action_map"],
+  "stages": {
+    "stage1": {"output_subdir": "tpz_cfpp_stage1_chunkwise", "chunk_frames": 3, "initial_max_train_steps": 500, "final_max_train_steps": 1000},
+    "stage2": {"output_subdir": "tpz_cfpp_stage2_chunkwise_from_stage1_500", "chunk_frames": 3, "num_denoising_steps": 48, "max_train_steps": 1000, "parent": "stage1/checkpoint-500", "note": "The later Stage1-1000 attempt resumed this old Stage2 lineage; checkpoint-1001 was deleted."},
+    "stage3_intended": {"chunk_frames": 3, "denoising_steps": [1000, 750, 500, 250], "completed_checkpoints": []}
+  }
+}

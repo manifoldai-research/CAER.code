@@ -1,0 +1,34 @@
+{
+  "variant": "exp03_framewise_2step",
+  "output_root": "outputs/cfpp_tpz0626_exp03_framewise_2step",
+  "initializer": "/path/to/checkpoint-10000/diffusion_pytorch_model.safetensors",
+  "modalities": [
+    "camera",
+    "arm",
+    "action_map"
+  ],
+  "stages": {
+    "stage1": {
+      "output_subdir": "tpz_cfpp_stage1_framewise",
+      "chunk_frames": 1,
+      "max_train_steps": 1000
+    },
+    "stage2": {
+      "output_subdir": "tpz_cfpp_stage2_framewise_from_stage1_1000",
+      "chunk_frames": 1,
+      "num_denoising_steps": 48,
+      "max_train_steps": 1000,
+      "parent": "stage1/checkpoint-1000"
+    },
+    "stage3": {
+      "output_subdir": "tpz_cfpp_stage3_framewise_2step",
+      "chunk_frames": 1,
+      "denoising_steps": [
+        1000,
+        500
+      ],
+      "max_train_steps": 300,
+      "parent": "stage2/checkpoint-1000 EMA"
+    }
+  }
+}

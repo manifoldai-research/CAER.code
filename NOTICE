@@ -1,0 +1,9 @@
+CAER
+Copyright 2026 CAER authors
+
+This repository includes modified snapshots of VideoX-Fun
+(https://github.com/aigc-apps/VideoX-Fun), licensed under the Apache License,
+Version 2.0. See sources/cap/LICENSE and sources/libero/LICENSE.
+
+Wan 2.2 model weights, datasets (LIBERO, RoboTwin, RealEstate10K, PoseAnything),
+and third-party benchmarks remain subject to their original licenses.

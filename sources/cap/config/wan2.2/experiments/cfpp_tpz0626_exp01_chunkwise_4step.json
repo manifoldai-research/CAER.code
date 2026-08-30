@@ -1,0 +1,12 @@
+{
+  "variant": "exp01_chunkwise_4step",
+  "output_root": "outputs/cfpp_tpz0626_exp01_chunkwise_4step",
+  "initializer": "/path/to/checkpoint-30000/diffusion_pytorch_model.safetensors",
+  "modalities": ["camera", "arm", "action_map"],
+  "legacy_warning": "The initializer and Stage 3 real score are camera-only and load with missing/unexpected keys; the training dataset itself is three-modal.",
+  "stages": {
+    "stage1": {"output_subdir": "tpz_cfpp_stage1_chunkwise", "chunk_frames": 3, "max_train_steps": 500},
+    "stage2": {"output_subdir": "tpz_cfpp_stage2_chunkwise", "chunk_frames": 3, "num_denoising_steps": 48, "max_train_steps": 1000, "parent": "stage1/checkpoint-500"},
+    "stage3_attempt": {"output_subdir": "tpz_cfpp_stage3_chunkwise_4step_old_camera_fixed", "chunk_frames": 3, "denoising_steps": [1000, 750, 500, 250], "max_train_steps": 300, "parent": "stage2/checkpoint-1000 EMA", "completed_checkpoints": []}
+  }
+}

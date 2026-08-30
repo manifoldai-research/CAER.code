@@ -1,0 +1,58 @@
+cff-version: 1.2.0
+message: If you use this software, please cite the CAER paper.
+title: "CAER: Causal Action Effect Reweighting for World Model Training"
+authors:
+  - family-names: Fang
+    given-names: Jianjie
+  - family-names: Liu
+    given-names: Xvyuan
+  - family-names: Wang
+    given-names: Ziyou
+  - family-names: Tang
+    given-names: Rongze
+  - family-names: Wang
+    given-names: Zhaolu
+  - family-names: Li
+    given-names: Zhuohang
+  - family-names: Zhang
+    given-names: Xin
+  - family-names: Su
+    given-names: Haisheng
+  - family-names: Gao
+    given-names: Chen
+  - family-names: Wu
+    given-names: Wei
+  - family-names: Chen
+    given-names: Xinlei
+  - family-names: Li
+    given-names: Yong
+preferred-citation:
+  type: article
+  title: "CAER: Causal Action Effect Reweighting for World Model Training"
+  authors:
+    - family-names: Fang
+      given-names: Jianjie
+    - family-names: Liu
+      given-names: Xvyuan
+    - family-names: Wang
+      given-names: Ziyou
+    - family-names: Tang
+      given-names: Rongze
+    - family-names: Wang
+      given-names: Zhaolu
+    - family-names: Li
+      given-names: Zhuohang
+    - family-names: Zhang
+      given-names: Xin
+    - family-names: Su
+      given-names: Haisheng
+    - family-names: Gao
+      given-names: Chen
+    - family-names: Wu
+      given-names: Wei
+    - family-names: Chen
+      given-names: Xinlei
+    - family-names: Li
+      given-names: Yong
+  year: 2026
+  notes: Tsinghua University, Manifold AI, University of Science and Technology of China
