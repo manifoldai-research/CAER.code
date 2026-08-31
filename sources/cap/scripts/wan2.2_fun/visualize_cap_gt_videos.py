@@ -172,7 +172,7 @@ def _render_case(
         args.width,
     )
     videos = {}
-    for mode, name in (("s_only", "S_only"), ("e_only", "E_only")):
+    for mode, name in (("CAER", "CAER"), ("MSE", "MSE")):
         frames = [
             weight_viz.overlay_weight_response(rgb[index], response_by_mode[mode][index], blur_radius=12.0)
             for index in range(args.frames)

@@ -3,7 +3,7 @@ set -euo pipefail
 
 usage() {
   cat <<'EOF'
-Usage: run_libero_ti2v_loss_volc.sh {s_max1|uniform}
+Usage: run_libero_ti2v_loss_volc.sh {MSE|CAER}
 
 One-line, single-node TI2V LIBERO arm training.
 
@@ -26,16 +26,16 @@ if [[ $# -lt 1 || "$1" == "-h" || "$1" == "--help" ]]; then
 fi
 
 if [[ "$1" == "ti2v" ]]; then
-  # Backward-compatible spelling for the original s_max1-only launcher.
+  # Backward-compatible spelling for the original CAER-only launcher.
   shift
-  set -- s_max1 "$@"
+  set -- CAER "$@"
 fi
 LOSS_VARIANT=$1
 shift
 case "${LOSS_VARIANT}" in
-  s_max1|uniform) ;;
+  MSE|CAER) ;;
   *)
-    echo "ERROR: loss must be s_max1 or uniform; got: ${LOSS_VARIANT}" >&2
+    echo "ERROR: loss must be MSE or CAER; got: ${LOSS_VARIANT}" >&2
     exit 2
     ;;
 esac

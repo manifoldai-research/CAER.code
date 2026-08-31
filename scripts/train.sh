@@ -21,8 +21,8 @@ fi
 MODE=$1
 shift
 case "${MODE}" in
-  libero) DEFAULT_VARIANT=s_max1 ;;
-  arm|camera|poseanything) DEFAULT_VARIANT=s_only ;;
+  libero) DEFAULT_VARIANT=CAER ;;
+  arm|camera|poseanything) DEFAULT_VARIANT=CAER ;;
   *) echo "ERROR: unsupported mode: ${MODE}" >&2; exit 2 ;;
 esac
 
@@ -31,11 +31,11 @@ if [[ $# -gt 0 && "${1}" != --* ]]; then
   shift
 fi
 case "${LOSS_VARIANT}" in
-  uniform|e_only|s_only|s_max1|current) ;;
+  MSE|CAER) ;;
   *) echo "ERROR: unsupported loss variant: ${LOSS_VARIANT}" >&2; exit 2 ;;
 esac
-if [[ "${MODE}" == "libero" && "${LOSS_VARIANT}" != "s_max1" && "${LOSS_VARIANT}" != "uniform" ]]; then
-  echo "ERROR: LIBERO supports only s_max1 or uniform" >&2
+if [[ "${MODE}" == "libero" && "${LOSS_VARIANT}" != "CAER" && "${LOSS_VARIANT}" != "MSE" ]]; then
+  echo "ERROR: LIBERO supports only MSE or CAER" >&2
   exit 2
 fi
 

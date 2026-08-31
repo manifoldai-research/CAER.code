@@ -19,7 +19,7 @@ Environment:
   TRAIN_DATA_META=PATH   Override the selected dataset metadata.
   TRAIN_DATA_DIR=PATH    Resolve relative media paths under this directory.
   OUTPUT_DIR=PATH        Override the run output directory.
-  METHOD1_LOSS_VARIANT   uniform|e_only|s_only|s_max1|current (default: current).
+  METHOD1_LOSS_VARIANT   MSE|CAER (default: CAER).
 EOF
 }
 
@@ -60,17 +60,17 @@ fi
 CONFIG_PATH="${CONFIG_PATH:-$REPO_ROOT/config/wan2.2/wan_civitai_5b.yaml}"
 DRY_RUN="${DRY_RUN:-0}"
 SMOKE="${SMOKE:-0}"
-# PoseAnything's formal migration path uses the CAP ablation S_only weights.
+# PoseAnything's formal migration path uses the CAP ablation CAER weights.
 # Keep this as the direct-entry default too; callers can still select another
 # variant explicitly for non-formal experiments.
 if [[ "$MODE" == "poseanything" && -z "${METHOD1_LOSS_VARIANT:-}" ]]; then
-    METHOD1_LOSS_VARIANT="s_only"
+    METHOD1_LOSS_VARIANT="CAER"
 else
-    METHOD1_LOSS_VARIANT="${METHOD1_LOSS_VARIANT:-current}"
+    METHOD1_LOSS_VARIANT="${METHOD1_LOSS_VARIANT:-CAER}"
 fi
 
 case "$METHOD1_LOSS_VARIANT" in
-    uniform|e_only|s_only|s_max1|current) ;;
+    MSE|CAER) ;;
     *)
         echo "ERROR: unsupported METHOD1_LOSS_VARIANT: $METHOD1_LOSS_VARIANT" >&2
         exit 2

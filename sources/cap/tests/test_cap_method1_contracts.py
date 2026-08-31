@@ -138,7 +138,7 @@ class CAPConditioningContractTest(unittest.TestCase):
         self.assertTrue(bool(torch.isfinite(uniform)))
 
     def test_method1_perfect_prediction_uses_uniform_weights(self):
-        for variant in ("uniform", "e_only", "s_only", "s_max1", "current"):
+        for variant in ("MSE", "CAER"):
             prediction = torch.zeros(2, 3, 4, 2, 2, requires_grad=True)
             target = torch.zeros_like(prediction)
             effect = torch.zeros(2, 1, 4, 2, 2)
@@ -168,24 +168,18 @@ class CAPConditioningContractTest(unittest.TestCase):
         target = torch.zeros_like(prediction)
         effect = torch.tensor([[[[[9.0]], [[2.0]], [[4.0]]]]])
         expected_rho = {
-            "uniform": torch.tensor([1.0, 1.0]),
-            "e_only": torch.tensor([0.5, 1.5]),
-            "s_only": torch.tensor([2.0 / 3.0, 4.0 / 3.0]),
-            "s_max1": torch.tensor([1.0, 4.0 / 3.0]),
-            "current": torch.tensor([0.4, 1.6]),
+            "MSE": torch.tensor([1.0, 1.0]),
+            "CAER": torch.tensor([2.0 / 3.0, 4.0 / 3.0]),
         }
         expected_loss = {
-            "uniform": 5.0,
-            "e_only": 7.0,
-            "s_only": 19.0 / 3.0,
-            "s_max1": 39.0 / 7.0,
-            "current": 7.4,
+            "MSE": 5.0,
+            "CAER": 19.0 / 3.0,
         }
         for variant, expected in expected_rho.items():
             loss, rho, uniform, _, _ = method1_focused_flow_loss(
                 prediction,
                 target,
-                effect if variant in {"s_only", "s_max1", "current"} else None,
+                effect if variant == "CAER" else None,
                 loss_variant=variant,
             )
             torch.testing.assert_close(rho.flatten(), expected)
@@ -195,11 +189,11 @@ class CAPConditioningContractTest(unittest.TestCase):
     def test_effect_map_is_required_only_for_s_variants(self):
         prediction = torch.randn(1, 2, 3, 1, 1)
         target = torch.randn_like(prediction)
-        for variant in ("uniform", "e_only"):
+        for variant in ("MSE",):
             method1_focused_flow_loss(
                 prediction, target, None, loss_variant=variant
             )
-        for variant in ("s_only", "s_max1", "current"):
+        for variant in ("CAER",):
             with self.assertRaisesRegex(ValueError, "effect_map is required"):
                 method1_focused_flow_loss(
                     prediction, target, None, loss_variant=variant
@@ -218,7 +212,7 @@ class CAPConditioningContractTest(unittest.TestCase):
                 prediction,
                 target,
                 None,
-                loss_variant="uniform",
+                loss_variant="MSE",
             )
         )
         expected = torch.tensor([2.5, 17.0])
@@ -289,9 +283,9 @@ class CAPLossRecordingContractTest(unittest.TestCase):
         self.assertIn('export DATALOADER_WORKERS="${DATALOADER_WORKERS:-2}"', launcher)
         self.assertIn('export LOW_VRAM="${LOW_VRAM:-1}"', launcher)
         self.assertIn('LOW_VRAM="${LOW_VRAM:-1}"', train_launcher)
-        self.assertIn('uniform|e_only|s_only|s_max1|current', launcher)
-        self.assertIn('uniform|e_only|s_only|s_max1|current', train_launcher)
-        self.assertIn('"s_max1",', training_script)
+        self.assertIn('MSE|CAER', launcher)
+        self.assertIn('MSE|CAER', train_launcher)
+        self.assertIn('"CAER",', training_script)
         self.assertIn('CONTROLLED_ABLATION_VARIABLES=(', launcher)
         self.assertIn('unset "$variable_name"', launcher)
         self.assertIn('CAP_ABLATION_RESUME_CHECKPOINT', launcher)

@@ -297,7 +297,7 @@ def export_case(args, case, sample_id: int, rho: dict[str, Any]) -> dict[str, An
     if selected[-1] != args.frames - 1:
         selected.append(args.frames - 1)
     report_weights = {}
-    for mode, name in (("s_only", "S_only"), ("e_only", "E_only")):
+    for mode, name in (("CAER", "CAER"), ("MSE", "MSE")):
         latent = rho[mode][0, 0].numpy().astype(np.float32)
         raw = weight_viz.render_map_to_video(
             rho[mode], args.frames, output_size=(args.height, args.width)
@@ -326,7 +326,7 @@ def export_case(args, case, sample_id: int, rho: dict[str, Any]) -> dict[str, An
             pngs.append(str(path))
         report_weights[mode] = {
             "name": name,
-            "quantity": "S / mean(S)" if mode == "s_only" else "E / mean(E)",
+            "quantity": "S / mean(S)" if mode == "CAER" else "MSE",
             "array": str(npz_path),
             "normalization": {"vmin": vmin, "vmax": vmax, "percentile": 99.0},
             "pngs": pngs,

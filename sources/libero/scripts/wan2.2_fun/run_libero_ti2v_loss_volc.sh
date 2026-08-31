@@ -2,4 +2,4 @@
 set -euo pipefail
 
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-exec bash "${SCRIPT_DIR}/run_libero_s_max1_volc.sh" "$@"
+exec bash "${SCRIPT_DIR}/run_libero_caer_volc.sh" "$@"

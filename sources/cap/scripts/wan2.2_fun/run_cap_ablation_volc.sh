@@ -3,7 +3,7 @@ set -euo pipefail
 
 usage() {
     cat <<'EOF'
-Usage: run_cap_ablation_volc.sh {arm|camera} {uniform|e_only|s_only|s_max1|current}
+Usage: run_cap_ablation_volc.sh {arm|camera} {MSE|CAER}
 
 Submit each command as an independent single-node Volcano job with 8 GPUs.
 Optional environment:
@@ -45,7 +45,7 @@ case "$MODALITY" in
         ;;
 esac
 case "$LOSS_VARIANT" in
-    uniform|e_only|s_only|s_max1|current) ;;
+    MSE|CAER) ;;
     *)
         echo "ERROR: invalid loss variant: $LOSS_VARIANT" >&2
         exit 2
@@ -81,7 +81,7 @@ for ((cap_arg_index = 0; cap_arg_index < ${#CAP_EXTRA_TRAIN_ARGS[@]}; cap_arg_in
 done
 
 CAP_TARGET_NONFINITE_GUARD=0
-if [[ "$MODALITY" == "camera" && "$LOSS_VARIANT" == "s_only" \
+if [[ "$MODALITY" == "camera" && "$LOSS_VARIANT" == "CAER" \
     && "$CAP_REQUESTED_ACTION_DROPOUT" == "0.05" \
     && "$CAP_REQUESTED_TAU_S" == "0.50" ]]; then
     CAP_TARGET_NONFINITE_GUARD=1
@@ -354,7 +354,7 @@ export METHOD1_LOSS_VARIANT="$LOSS_VARIANT"
 export METHOD1_TAU_S=0.50
 export METHOD1_EPS=1e-6
 export METHOD1_MSE_THRESHOLD=0
-# Only the known unstable Camera s_only dropout=0.05/tau=0.50 run receives
+# Only the known unstable Camera caer dropout=0.05/tau=0.50 run receives
 # this guard. All other formal ablations keep their original update path.
 export METHOD1_SKIP_NONFINITE_UPDATES="$CAP_TARGET_NONFINITE_GUARD"
 export METHOD1_MAX_NONFINITE_UPDATE_SKIPS="${METHOD1_MAX_NONFINITE_UPDATE_SKIPS:-10}"
@@ -416,7 +416,7 @@ echo "CAP Python bytecode: writes=disabled prefix=$PYTHONPYCACHEPREFIX scope=nod
 echo "CAP caches: xdg=$XDG_CACHE_HOME hf=$HF_HOME tmp=$TMPDIR cuda=$CUDA_CACHE_PATH inductor=$TORCHINDUCTOR_CACHE_DIR"
 echo "CAP performance: low_vram=$LOW_VRAM dataloader_workers_per_rank=$DATALOADER_WORKERS dataloader_workers_total=$((NUM_GPUS * DATALOADER_WORKERS)) skip_sanity_check=$SKIP_SANITY_CHECK"
 if [[ "$METHOD1_SKIP_NONFINITE_UPDATES" == "1" ]]; then
-    echo "CAP nonfinite update guard: enabled for camera/s_only dropout=0.05 tau=0.50"
+    echo "CAP nonfinite update guard: enabled for camera/caer dropout=0.05 tau=0.50"
 fi
 echo "CAP data selection: requested=$CAP_ABLATION_TRAIN_SAMPLES aligned_limit=$CAP_ALIGNED_TRAIN_SAMPLES metadata_samples=$CAP_SELECTED_METADATA_SAMPLES scheduled_samples=$CAP_SCHEDULED_TRAIN_SAMPLES"
 echo "CAP records: metrics=$BENCHMARK_TIMING_PATH sample_losses=$METHOD1_SAMPLE_LOSS_DIR"
@@ -447,7 +447,7 @@ fi
     echo "CAP caches: xdg=$XDG_CACHE_HOME hf=$HF_HOME tmp=$TMPDIR cuda=$CUDA_CACHE_PATH inductor=$TORCHINDUCTOR_CACHE_DIR"
     echo "CAP performance: low_vram=$LOW_VRAM dataloader_workers_per_rank=$DATALOADER_WORKERS dataloader_workers_total=$((NUM_GPUS * DATALOADER_WORKERS)) skip_sanity_check=$SKIP_SANITY_CHECK"
     if [[ "$METHOD1_SKIP_NONFINITE_UPDATES" == "1" ]]; then
-        echo "CAP nonfinite update guard: enabled for camera/s_only dropout=0.05 tau=0.50"
+        echo "CAP nonfinite update guard: enabled for camera/caer dropout=0.05 tau=0.50"
     fi
     echo "CAP data selection: requested=$CAP_ABLATION_TRAIN_SAMPLES aligned_limit=$CAP_ALIGNED_TRAIN_SAMPLES metadata_samples=$CAP_SELECTED_METADATA_SAMPLES scheduled_samples=$CAP_SCHEDULED_TRAIN_SAMPLES"
     echo "CAP records: metrics=$BENCHMARK_TIMING_PATH sample_losses=$METHOD1_SAMPLE_LOSS_DIR"

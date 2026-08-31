@@ -3,7 +3,7 @@ set -euo pipefail
 
 usage() {
     cat <<'EOF'
-Usage: run_cap_ablation_volc.sh {arm|camera} {uniform|e_only|s_only|s_max1|current}
+Usage: run_cap_ablation_volc.sh {arm|camera} {MSE|CAER}
 
 Submit each command as an independent single-node Volcano job with 8 GPUs.
 Optional environment:
@@ -44,7 +44,7 @@ case "$MODALITY" in
         ;;
 esac
 case "$LOSS_VARIANT" in
-    uniform|e_only|s_only|s_max1|current) ;;
+    MSE|CAER) ;;
     *)
         echo "ERROR: invalid loss variant: $LOSS_VARIANT" >&2
         exit 2

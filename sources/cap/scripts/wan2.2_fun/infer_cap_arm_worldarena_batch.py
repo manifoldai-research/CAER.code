@@ -162,7 +162,7 @@ def save_case_heatmaps(
         )
     outputs = {}
     for mode in args.mse_heatmap_weights:
-        if mode == "uniform":
+        if mode == "MSE":
             values = pixel_mse
             quantity = "pixel RGB MSE"
         else:
@@ -245,8 +245,8 @@ def generate_case(args, case: dict[str, Any], checkpoint, cache_dir, pipeline, c
     )
     chunks = []
     pixel_mse_chunks = []
-    rho_chunks = {mode: [] for mode in args.mse_heatmap_weights if mode != "uniform"}
-    needs_latent_diagnostic = any(mode != "uniform" for mode in args.mse_heatmap_weights)
+    rho_chunks = {mode: [] for mode in args.mse_heatmap_weights if mode != "MSE"}
+    needs_latent_diagnostic = any(mode != "MSE" for mode in args.mse_heatmap_weights)
     gt_reader = None
     gt_indices = None
     gt_alignment = None
@@ -321,7 +321,7 @@ def generate_case(args, case: dict[str, Any], checkpoint, cache_dir, pipeline, c
             )
             if capture is not None:
                 for mode in args.mse_heatmap_weights:
-                    if mode == "uniform":
+                    if mode == "MSE":
                         continue
                     rendered = mse_heatmap.render_map_to_video(
                         capture.rho_maps[mode],

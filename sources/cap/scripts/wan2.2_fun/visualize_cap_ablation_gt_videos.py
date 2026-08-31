@@ -267,7 +267,7 @@ def default_transformer_cache(args: argparse.Namespace) -> Path:
         root = Path(os.environ.get("MODEL_CACHE_ROOT", "outputs/model-cache"))
     else:
         root = Path(os.environ.get("CAMERA_MODEL_CACHE_ROOT", "outputs/camera-model-cache"))
-    return root / "s_only" / run_id / checkpoint_name / "transformer"
+    return root / "CAER" / run_id / checkpoint_name / "transformer"
 
 
 def load_transformer(args: argparse.Namespace):
@@ -279,7 +279,7 @@ def load_transformer(args: argparse.Namespace):
         else default_transformer_cache(args).resolve()
     )
     loader_args = SimpleNamespace(
-        variant="s_only",
+        variant="CAER",
         model_root=args.model_root.resolve(),
         architecture_mode=args.mode,
         arm_action_dim=14,
@@ -442,7 +442,7 @@ def write_video(path: Path, frames, fps: float) -> None:
 
 def complete_case(case_dir: Path) -> dict[str, Any] | None:
     manifest = case_dir / "manifest.json"
-    required = ("S_only.mp4", "E_only.mp4", "original.mp4")
+    required = ("CAER.mp4", "MSE.mp4", "original.mp4")
     if not manifest.is_file() or not all(
         (case_dir / name).is_file() and (case_dir / name).stat().st_size > 0
         for name in required
@@ -465,7 +465,7 @@ def export_case(
     videos: dict[str, str] = {}
     arrays: dict[str, str] = {}
     normalization: dict[str, Any] = {}
-    for mode, name in (("s_only", "S_only"), ("e_only", "E_only")):
+    for mode, name in (("CAER", "CAER"), ("MSE", "MSE")):
         latent = rho[mode][0, 0].numpy().astype(np.float32)
         raw = weight_viz.render_map_to_video(
             rho[mode], args.frames, output_size=(args.height, args.width)

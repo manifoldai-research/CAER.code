@@ -15,7 +15,7 @@ from pathlib import Path
 from typing import Any
 
 
-VARIANTS = ("uniform", "e_only", "s_only", "s_max1", "current")
+VARIANTS = ("MSE", "CAER")
 DEFAULT_METADATA = Path(os.environ.get("ARM_METADATA", "data/arm/metadata.json"))
 DEFAULT_MODEL = Path(os.environ.get("CAP_CONTROL_MODEL", "models/ti2v_control_init_model"))
 DEFAULT_RUNS_ROOT = Path(os.environ.get("ARM_RUNS_ROOT", "outputs/arm"))
@@ -35,7 +35,7 @@ def parse_args() -> argparse.Namespace:
     sample_group = parser.add_mutually_exclusive_group(required=True)
     sample_group.add_argument("--sample-id", type=int, dest="sample_id")
     sample_group.add_argument("--metadata-index", type=int, dest="sample_id")
-    parser.add_argument("--variant", choices=VARIANTS, default="current")
+    parser.add_argument("--variant", choices=VARIANTS, default="CAER")
     parser.add_argument(
         "--checkpoint-step",
         type=int,

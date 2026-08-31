@@ -77,7 +77,7 @@ class Method1LossLoggingTest(unittest.TestCase):
                 prediction,
                 target,
                 None,
-                loss_variant="uniform",
+                loss_variant="MSE",
             )
         )
         expected = torch.tensor([2.5, 17.0])

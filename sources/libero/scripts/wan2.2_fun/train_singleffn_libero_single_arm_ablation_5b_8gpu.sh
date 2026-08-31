@@ -138,7 +138,7 @@ echo "LOG_FILE=${LOG_FILE}"
 echo "ENABLE_METHOD1_FOCUSED_LOSS=${ENABLE_METHOD1_FOCUSED_LOSS:-0}"
 echo "ZERO_INIT_ARM_ACTION_OUTPUT=${ZERO_INIT_ARM_ACTION_OUTPUT:-0}"
 if [[ "${ENABLE_METHOD1_FOCUSED_LOSS:-0}" == "1" ]]; then
-  echo "METHOD1_LOSS_VARIANT=${METHOD1_LOSS_VARIANT:-s_max1}"
+  echo "METHOD1_LOSS_VARIANT=${METHOD1_LOSS_VARIANT:-CAER}"
   echo "METHOD1_ACTION_DROPOUT_PROB=${METHOD1_ACTION_DROPOUT_PROB:-0.10}"
   echo "METHOD1_TAU_S=${METHOD1_TAU_S:-0.50}"
   echo "METHOD1_EPS=${METHOD1_EPS:-1e-6}"
@@ -178,7 +178,7 @@ METHOD1_ARGS=()
 if [[ "${ENABLE_METHOD1_FOCUSED_LOSS}" == "1" ]]; then
   METHOD1_ARGS=(
     --enable_method1_focused_loss
-    --method1_loss_variant "${METHOD1_LOSS_VARIANT:-s_max1}"
+    --method1_loss_variant "${METHOD1_LOSS_VARIANT:-CAER}"
     --method1_action_dropout_prob "${METHOD1_ACTION_DROPOUT_PROB:-0.10}"
     --method1_tau_s "${METHOD1_TAU_S:-0.50}"
     --method1_eps "${METHOD1_EPS:-1e-6}"

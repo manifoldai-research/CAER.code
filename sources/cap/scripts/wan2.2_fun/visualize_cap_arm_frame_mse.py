@@ -196,7 +196,7 @@ def compute_frame_metrics(args: argparse.Namespace, pipeline, case, sample_id: i
     latent_frame_mse = residual.square().mean(dim=(1, 3, 4))[0]
     frame_mse = interpolate_latent_metric(latent_frame_mse, args.frames)
 
-    # Match the detached s_only training weight and differentiate its normalized
+    # Match the detached caer training weight and differentiate its normalized
     # weighted loss analytically with respect to the transformer prediction.
     effect = torch.linalg.vector_norm(
         prediction.float() - null_prediction.float(), ord=2, dim=1, keepdim=True
@@ -392,7 +392,7 @@ def render_case(
             {
                 "sample_id": sample_id,
                 "frame_indices": case["indices"],
-                "metric": "L2 norm of d(s_only weighted loss)/d(transformer prediction)",
+                "metric": "L2 norm of d(caer weighted loss)/d(transformer prediction)",
                 "frame_gradient_l2": [
                     float(value) for value in frame_gradient_l2
                 ],
@@ -424,7 +424,7 @@ def render_case(
         "reduction": "mean over latent channels and spatial tokens",
         "temporal_mapping": "linear interpolation from latent frames to 17 RGB frames",
         "global_color_scale": {"vmin": mse_vmin, "vmax": mse_vmax},
-        "gradient_metric": "L2 norm of d(s_only weighted loss)/d(transformer prediction)",
+        "gradient_metric": "L2 norm of d(caer weighted loss)/d(transformer prediction)",
         "gradient_reduction": "L2 norm over latent channels and spatial tokens",
         "gradient_excludes_first_latent_frame": True,
         "gradient_global_color_scale": {
@@ -562,7 +562,7 @@ def main() -> int:
         "metric": "conditioned latent flow-matching residual MSE",
         "diagnostic_sigma": args.diagnostic_sigma,
         "global_color_scale": {"vmin": mse_vmin, "vmax": mse_vmax},
-        "gradient_metric": "L2 norm of d(s_only weighted loss)/d(transformer prediction)",
+        "gradient_metric": "L2 norm of d(caer weighted loss)/d(transformer prediction)",
         "gradient_excludes_first_latent_frame": True,
         "gradient_global_color_scale": {
             "vmin": gradient_vmin,

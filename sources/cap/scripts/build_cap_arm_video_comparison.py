@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import Any
 
 
-DEFAULT_VARIANTS = ("uniform", "e_only", "s_only", "s_max1", "current")
+DEFAULT_VARIANTS = ("MSE", "CAER")
 
 
 def parse_args() -> argparse.Namespace:
@@ -169,14 +169,14 @@ def build_data(root: Path, variants: list[str]) -> dict[str, Any]:
 
     all_ids = set().union(*(records.keys() for records in discovered.values()))
     preferred_order: list[int] = []
-    current_source = sources.get("current", {})
-    current_batch = current_source.get("batch")
-    current_selection = (
-        selection_info(root / "current" / "random-batches" / current_batch)
-        if current_batch
+    caer_source = sources.get("CAER", {})
+    caer_batch = caer_source.get("batch")
+    caer_selection = (
+        selection_info(root / "CAER" / "random-batches" / caer_batch)
+        if caer_batch
         else {}
     )
-    for sample_id in current_selection.get("selected_ids", []):
+    for sample_id in caer_selection.get("selected_ids", []):
         if sample_id in all_ids and sample_id not in preferred_order:
             preferred_order.append(sample_id)
     ordered_ids = preferred_order + sorted(all_ids.difference(preferred_order))
@@ -187,7 +187,7 @@ def build_data(root: Path, variants: list[str]) -> dict[str, Any]:
         variants_data = {
             variant: discovered[variant].get(sample_id) for variant in variants
         }
-        target_record = variants_data.get("current")
+        target_record = variants_data.get("CAER")
         if target_record is None:
             target_record = next(
                 (record for record in variants_data.values() if record is not None), None

@@ -170,8 +170,8 @@ def main() -> int:
     parser.add_argument("--smooth-sigma", type=float, default=20.0)
     parser.add_argument("--envelope-window", type=int, default=101)
     parser.add_argument("--output-dir", type=Path, required=True)
-    parser.add_argument("--s-root", type=Path, required=True, help="LIBERO s_max1 run directory")
-    parser.add_argument("--u-root", type=Path, required=True, help="LIBERO uniform run directory")
+    parser.add_argument("--s-root", type=Path, required=True, help="LIBERO CAER run directory")
+    parser.add_argument("--u-root", type=Path, required=True, help="LIBERO MSE run directory")
     args = parser.parse_args()
     if args.max_step < 1 or args.smooth_sigma <= 0 or args.envelope_window < 3 or args.envelope_window % 2 == 0:
         raise ValueError("max-step >= 1, smooth-sigma > 0, and odd envelope-window >= 3 are required")
@@ -180,30 +180,30 @@ def main() -> int:
     u_root = args.u_root
     s_log = next((s_root / "logs").glob("train_*.log"))
     u_log = next((u_root / "logs").glob("train_*.log"))
-    s = parse_stats(s_log, "s_max1", args.max_step)
-    u = parse_stats(u_log, "uniform", args.max_step)
+    s = parse_stats(s_log, "CAER", args.max_step)
+    u = parse_stats(u_log, "MSE", args.max_step)
     series = {
-        "s_max1_focused": ("s_max1 focused_loss", s["focused_loss"], (220, 55, 55)),
-        "s_max1_uniform": ("s_max1 uniform_loss", s["uniform_loss"], (239, 126, 34)),
+        "caer_focused": ("caer focused_loss", s["focused_loss"], (220, 55, 55)),
+        "caer_uniform": ("caer uniform_loss", s["uniform_loss"], (239, 126, 34)),
         "uniform_uniform": ("uniform uniform_loss", u["uniform_loss"], (45, 105, 205)),
     }
     out = args.output_dir.resolve()
-    draw_chart(out / "01_s_max1_two_losses.png", "s_max1: focused loss and uniform loss", [series["s_max1_focused"], series["s_max1_uniform"]], args.smooth_sigma, args.envelope_window)
-    draw_chart(out / "02_uniform_loss_comparison.png", "uniform loss: s_max1 vs uniform", [series["s_max1_uniform"], series["uniform_uniform"]], args.smooth_sigma, args.envelope_window)
-    draw_chart(out / "03_all_three_losses.png", "all requested losses", [series["s_max1_focused"], series["s_max1_uniform"], series["uniform_uniform"]], args.smooth_sigma, args.envelope_window)
+    draw_chart(out / "01_caer_two_losses.png", "caer: focused loss and uniform loss", [series["caer_focused"], series["caer_uniform"]], args.smooth_sigma, args.envelope_window)
+    draw_chart(out / "02_uniform_loss_comparison.png", "uniform loss: caer vs uniform", [series["caer_uniform"], series["uniform_uniform"]], args.smooth_sigma, args.envelope_window)
+    draw_chart(out / "03_all_three_losses.png", "all requested losses", [series["caer_focused"], series["caer_uniform"], series["uniform_uniform"]], args.smooth_sigma, args.envelope_window)
 
     with (out / "loss_curves.csv").open("w", newline="", encoding="utf-8") as handle:
         writer = csv.writer(handle)
-        writer.writerow(["step", "s_max1_focused_loss", "s_max1_uniform_loss", "uniform_uniform_loss"])
+        writer.writerow(["step", "caer_focused_loss", "caer_uniform_loss", "uniform_uniform_loss"])
         for i in range(args.max_step + 1):
             writer.writerow([i, s["focused_loss"][i], s["uniform_loss"][i], u["uniform_loss"][i]])
     metadata = {
-        "s_max1_log": str(s_log),
+        "caer_log": str(s_log),
         "uniform_log": str(u_log),
         "steps": [0, args.max_step],
         "points_per_series": args.max_step + 1,
         "smoothing": {"center": "gaussian", "sigma": args.smooth_sigma, "envelope": "rolling_quantile_p10_p90", "window": args.envelope_window},
-        "colors": {"s_max1_focused": "#dc3737", "s_max1_uniform": "#ef7e22", "uniform_uniform": "#2d69cd"},
+        "colors": {"caer_focused": "#dc3737", "caer_uniform": "#ef7e22", "uniform_uniform": "#2d69cd"},
     }
     (out / "manifest.json").write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
     print(out)

@@ -1,7 +1,7 @@
 import torch
 
 
-METHOD1_LOSS_VARIANTS = ("uniform", "e_only", "s_only", "s_max1", "current")
+METHOD1_LOSS_VARIANTS = ("MSE", "CAER")
 
 
 def _future_mean(values, exclude_first_frame):
@@ -31,7 +31,7 @@ def method1_focused_flow_loss(
     eps=1e-6,
     mse_threshold=0.0,
     exclude_first_frame=True,
-    loss_variant="current",
+    loss_variant="CAER",
 ):
     if loss_variant not in METHOD1_LOSS_VARIANTS:
         raise ValueError(
@@ -51,12 +51,8 @@ def method1_focused_flow_loss(
         pred_f.detach() - target_f, ord=2, dim=1, keepdim=True
     )
 
-    if loss_variant == "uniform":
+    if loss_variant == "MSE":
         rho = torch.ones_like(residual_map)
-    elif loss_variant == "e_only":
-        rho = _normalize_token_map(
-            residual_map, eps, exclude_first_frame
-        ).detach()
     else:
         if effect_map is None:
             raise ValueError(f"effect_map is required for loss_variant={loss_variant!r}")
@@ -70,21 +66,9 @@ def method1_focused_flow_loss(
         if not bool(torch.isfinite(effect_f).all()):
             raise ValueError("effect_map contains non-finite values")
 
-        if loss_variant == "s_only":
-            rho = _normalize_token_map(
-                effect_f, eps, exclude_first_frame
-            ).detach()
-        else:
-            effect_mean = _future_mean(effect_f, exclude_first_frame)
-            s_hat = effect_f / effect_mean.clamp_min(float(eps))
-            s_max1 = torch.maximum(s_hat, torch.ones_like(s_hat))
-            if loss_variant == "s_max1":
-                rho = s_max1.detach()
-            else:
-                candidate = s_max1 * residual_map
-                rho = _normalize_token_map(
-                    candidate, eps, exclude_first_frame
-                ).detach()
+        rho = _normalize_token_map(
+            effect_f, eps, exclude_first_frame
+        ).detach()
 
     if active_mask is not None:
         rho = torch.where(

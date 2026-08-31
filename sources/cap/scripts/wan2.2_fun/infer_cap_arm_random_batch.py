@@ -32,7 +32,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--world-size", type=int, default=4)
     parser.add_argument("--prepare-only", action="store_true")
     parser.add_argument("--dry-run", action="store_true")
-    parser.add_argument("--variant", choices=single.VARIANTS, default="current")
+    parser.add_argument("--variant", choices=single.VARIANTS, default="CAER")
     parser.add_argument("--checkpoint-step", type=int, default=None)
     parser.add_argument("--run-dir", type=Path, default=None)
     parser.add_argument("--runs-root", type=Path, default=single.DEFAULT_RUNS_ROOT)

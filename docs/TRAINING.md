@@ -123,26 +123,26 @@ Preflight checks model shards, input channels, the first metadata record, the fi
 Run from the repository root. Submit each formal command as one 8-GPU job.
 
 ```bash
-bash scripts/train_libero.sh s_max1          # paper CAER setting
-bash scripts/train_libero.sh uniform         # matched MSE baseline
-bash scripts/train_arm.sh s_only
-bash scripts/train_camera.sh s_only
-bash scripts/train_poseanything.sh s_only
-bash scripts/train.sh camera s_only          # equivalent unified entry
-bash scripts/train_arm.sh s_only --max_train_steps 2000
+bash scripts/train_libero.sh CAER          # paper CAER setting
+bash scripts/train_libero.sh MSE           # matched MSE baseline
+bash scripts/train_arm.sh CAER
+bash scripts/train_camera.sh CAER
+bash scripts/train_poseanything.sh CAER
+bash scripts/train.sh camera CAER         # equivalent unified entry
+bash scripts/train_arm.sh CAER --max_train_steps 2000
 ```
 
-Accepted loss variants: `uniform`, `e_only`, `s_only`, `s_max1`, `current`. LIBERO accepts only `s_max1` or `uniform`.
+Accepted loss variants: `MSE`, `CAER`. LIBERO accepts only `MSE` or `CAER`.
 
 ## 6. Dry-run, Smoke, Resume
 
 ```bash
-DRY_RUN=1 bash scripts/train_camera.sh s_only
-DRY_RUN=1 CAP_SKIP_RUNTIME_PREFLIGHT=1 bash scripts/train_camera.sh s_only
-SMOKE=1 bash scripts/train_poseanything.sh s_only
+DRY_RUN=1 bash scripts/train_camera.sh CAER
+DRY_RUN=1 CAP_SKIP_RUNTIME_PREFLIGHT=1 bash scripts/train_camera.sh CAER
+SMOKE=1 bash scripts/train_poseanything.sh CAER
 
 RESUME_FROM_CHECKPOINT=/path/to/run/checkpoint-5000 \
-bash scripts/train_camera.sh s_only
+bash scripts/train_camera.sh CAER
 ```
 
 `CAP_SKIP_RUNTIME_PREFLIGHT=1` is rejected unless `DRY_RUN=1`. `--max_train_steps` is the absolute final optimizer step. Resume with the same modality, loss, topology, batch, optimizer, and data contract.

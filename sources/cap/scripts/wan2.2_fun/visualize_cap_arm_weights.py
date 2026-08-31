@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Export S_only and E_only weight overlays for one WorldArena episode."""
+"""Export CAER and MSE weight overlays for one WorldArena episode."""
 
 from __future__ import annotations
 
@@ -14,7 +14,7 @@ import infer_cap_arm_sample as single
 import infer_cap_arm_worldarena_batch as batch
 
 
-WEIGHT_MODES = ("s_only", "e_only")
+WEIGHT_MODES = ("MSE", "CAER")
 RENDERING_CONFIG = {
     "normalization": "episode_interpolated_global_min_to_latent_positive_p99",
     "vmin": "episode_interpolated_min_excluding_first_frame",
@@ -48,7 +48,7 @@ def parse_args() -> argparse.Namespace:
         default="50,7,48",
         help="Comma-separated episode IDs processed sequentially with one model load.",
     )
-    parser.add_argument("--variant", choices=single.VARIANTS, default="s_only")
+    parser.add_argument("--variant", choices=single.VARIANTS, default="CAER")
     parser.add_argument("--checkpoint-step", type=int, default=5000)
     parser.add_argument("--run-dir", type=Path, required=True)
     parser.add_argument("--model-root", type=Path, default=single.DEFAULT_MODEL)
@@ -282,7 +282,7 @@ def export_overlays(
     original_frames = read_selected_video_frames(video_path, selected)
     output = {}
     for mode in WEIGHT_MODES:
-        mode_name = "S_only" if mode == "s_only" else "E_only"
+        mode_name = mode
         mode_dir = output_dir / mode_name
         mode_dir.mkdir(parents=True, exist_ok=True)
         array_path = output_dir / f"{mode_name}_weights.npz"
@@ -311,7 +311,7 @@ def export_overlays(
             pngs.append(str(png_path))
         output[mode] = {
             "name": mode_name,
-            "quantity": "S / mean(S)" if mode == "s_only" else "E / mean(E)",
+            "quantity": "S / mean(S)" if mode == "CAER" else "MSE",
             "array": str(array_path),
             "stats": weight_viz.heatmap_stats(weights[mode]),
             "normalization": {

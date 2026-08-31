@@ -48,7 +48,7 @@ def checkpoint_identity(checkpoint: Path) -> tuple[str, str, int]:
         raise ValueError(f"invalid checkpoint directory name: {checkpoint}") from error
     run_dir = checkpoint.parent
     variant = run_dir.parent.name
-    if variant not in {"s_only", "uniform", "s_max1"}:
+    if variant not in {"CAER", "MSE"}:
         raise ValueError(f"unsupported Camera checkpoint variant: {variant}")
     return variant, run_dir.name, step
 

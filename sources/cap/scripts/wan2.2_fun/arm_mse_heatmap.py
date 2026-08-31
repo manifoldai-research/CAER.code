@@ -14,15 +14,12 @@ from typing import Any, Iterable, Mapping, Sequence
 import numpy as np
 
 
-WEIGHT_MODES = ("uniform", "e_only", "s_only", "s_max1", "current")
-WEIGHTED_MODES = WEIGHT_MODES[1:]
-EFFECT_MODES = ("s_only", "s_max1", "current")
+WEIGHT_MODES = ("MSE", "CAER")
+WEIGHTED_MODES = WEIGHT_MODES
+EFFECT_MODES = ("CAER",)
 OUTPUT_NAMES = {
-    "uniform": "mse",
-    "e_only": "weighted_mse_e_only",
-    "s_only": "weighted_mse_s_only",
-    "s_max1": "weighted_mse_s_max1",
-    "current": "weighted_mse_current",
+    "MSE": "MSE",
+    "CAER": "CAER",
 }
 
 
@@ -36,15 +33,15 @@ def parse_weight_selection(value: str | Sequence[str] | None) -> tuple[str, ...]
     if value is None:
         return ()
     if isinstance(value, str):
-        raw = value.strip().lower()
+        raw = value.strip().upper()
         if not raw or raw == "none":
             return ()
         raw_parts = raw.split(",")
         if any(not part.strip() for part in raw_parts):
             raise ValueError("MSE heatmap selection contains an empty mode")
-        parts = [part.strip().lower() for part in raw_parts]
+        parts = [part.strip().upper() for part in raw_parts]
     else:
-        parts = [str(part).strip().lower() for part in value]
+        parts = [str(part).strip().upper() for part in value]
         if any(not part for part in parts):
             raise ValueError("MSE heatmap selection contains an empty mode")
     if not parts or parts == ["none"]:
@@ -169,13 +166,13 @@ def compute_rho_maps(
 
     ``rho`` follows ``videox_fun.training.method1_focused_loss`` exactly.  The
     returned maps have shape ``[B, 1, T-1, H, W]`` when the first frame is
-    excluded, matching the loss's future-token domain.  ``uniform`` has no
-    rho and is omitted from the result.
+    excluded, matching the loss's future-token domain.  ``MSE`` uses unit
+    weights and ``CAER`` uses detached action-effect weights.
     """
 
     import torch
 
-    selected = tuple(mode for mode in parse_weight_selection(modes) if mode != "uniform")
+    selected = parse_weight_selection(modes)
     if not selected:
         return {}
     _validate_prediction_shapes(prediction, target)
@@ -200,18 +197,10 @@ def compute_rho_maps(
 
     rho_by_mode = {}
     for mode in selected:
-        if mode == "e_only":
-            rho_by_mode[mode] = _normalize_token_map(residual_map, eps, exclude_first_frame).detach()
-        elif mode == "s_only":
+        if mode == "MSE":
+            rho_by_mode[mode] = torch.ones_like(residual_map)
+        elif mode == "CAER":
             rho_by_mode[mode] = _normalize_token_map(effect_f, eps, exclude_first_frame).detach()
-        else:
-            effect_mean = _future_mean(effect_f, exclude_first_frame)
-            s_hat = effect_f / effect_mean.clamp_min(float(eps))
-            s_max1 = torch.maximum(s_hat, torch.ones_like(s_hat))
-            if mode == "s_max1":
-                rho_by_mode[mode] = s_max1.detach()
-            else:
-                rho_by_mode[mode] = _normalize_token_map(s_max1 * residual_map, eps, exclude_first_frame).detach()
 
     drop_first = exclude_first_frame and prediction.shape[2] > 1
     if drop_first:
@@ -257,7 +246,7 @@ def compute_weight_maps(
         exclude_first_frame=exclude_first_frame,
     )
     return {
-        mode: mse if mode == "uniform" else mse * rho_by_mode[mode]
+        mode: mse if mode == "MSE" else mse * rho_by_mode[mode]
         for mode in selected
     }
 

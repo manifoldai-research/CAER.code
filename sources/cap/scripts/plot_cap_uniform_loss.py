@@ -13,7 +13,7 @@ from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 
 
-VARIANTS = ("uniform", "e_only", "s_only", "s_max1", "current")
+VARIANTS = ("MSE", "CAER")
 
 
 def latest_run(root: Path, variant: str) -> Path:
@@ -64,8 +64,8 @@ def read_uniform_loss(path: Path, start: int | None, end: int | None) -> tuple[l
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
-            "Plot method1_uniform_loss from the latest timestamped Arm run of "
-            "uniform, e_only, s_only, s_max1, and current."
+            "Plot the MSE diagnostic from the latest timestamped Arm run of "
+            "MSE and CAER."
         )
     )
     parser.add_argument(
@@ -163,11 +163,8 @@ def draw_plot(
     grid_color = (220, 224, 230)
     axis_color = (70, 70, 70)
     colors = {
-        "uniform": (31, 119, 180),
-        "e_only": (255, 127, 14),
-        "s_only": (44, 160, 44),
-        "s_max1": (148, 103, 189),
-        "current": (214, 39, 40),
+        "MSE": (31, 119, 180),
+        "CAER": (44, 160, 44),
     }
 
     all_losses = [loss for _, losses in series.values() for loss in losses]

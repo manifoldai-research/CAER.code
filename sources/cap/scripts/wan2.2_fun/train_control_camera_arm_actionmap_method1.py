@@ -1545,12 +1545,10 @@ def parse_args():
     parser.add_argument(
         "--method1_loss_variant",
         type=str,
-        default="current",
-        choices=["uniform", "e_only", "s_only", "s_max1", "current"],
+        default="CAER",
+        choices=["MSE", "CAER"],
         help=(
-            "Ablation weight: uniform rho=1; e_only rho=E/mean(E); "
-            "s_only rho=S/mean(S); s_max1 rho=max(S/mean(S),1); "
-            "current rho=normalize(max(S/mean(S),1)*E)."
+            "MSE uses rho=1; CAER uses the validated action-effect weighting."
         ),
     )
     parser.add_argument(
@@ -4249,11 +4247,7 @@ def main():
                     or method1_has_camera_condition
                     or method1_has_latent_condition
                 )
-                method1_requires_effect_map = args.method1_loss_variant in {
-                    "s_only",
-                    "s_max1",
-                    "current",
-                }
+                method1_requires_effect_map = args.method1_loss_variant == "CAER"
                 method1_effect_map = None
                 method1_main_arm_action_mask = arm_action_mask
                 method1_main_control_camera_mask = control_camera_mask

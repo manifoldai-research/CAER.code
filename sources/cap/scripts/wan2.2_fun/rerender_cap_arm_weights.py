@@ -14,7 +14,7 @@ from PIL import Image
 import arm_mse_heatmap as weight_viz
 
 
-MODES = (("s_only", "S_only"), ("e_only", "E_only"))
+MODES = (("CAER", "CAER"), ("MSE", "MSE"))
 RENDERING = {
     "normalization": "episode_interpolated_global_min_to_latent_positive_p99",
     "vmin": "episode_interpolated_min_excluding_first_frame",
@@ -49,7 +49,7 @@ def parse_args():
     parser.add_argument(
         "--only-se-product",
         action="store_true",
-        help="Render only S*E/mean(S*E), preserving existing S_only/E_only PNGs.",
+        help="Render only S*E/mean(S*E), preserving existing CAER/MSE PNGs.",
     )
     parser.add_argument(
         "--only-se2-product",
@@ -153,7 +153,7 @@ def main() -> int:
             mode: np.load(episode_dir / f"{name}_weights.npz")["weights"]
             for mode, name in MODES
         }
-        frame_count = len(arrays["s_only"])
+        frame_count = len(arrays["CAER"])
         frames = read_video(
             args.video_dir / f"{episode}.mp4", args.height, args.width
         )
@@ -221,7 +221,7 @@ def main() -> int:
                 frames=frames,
                 selected=selected,
                 chunks=weight_viz.normalize_latent_product_chunks(
-                    recovered["s_only"], recovered["e_only"]
+                    recovered["CAER"], recovered["MSE"]
                 ),
                 frame_count=frame_count,
                 output_size=(args.height, args.width),
@@ -231,14 +231,14 @@ def main() -> int:
                 reconstruction_error=product_error,
             )
         if args.only_se2_product:
-            squared_e = [chunk * chunk for chunk in recovered["e_only"]]
+            squared_e = [chunk * chunk for chunk in recovered["MSE"]]
             render_product_mode(
                 report=report,
                 episode_dir=episode_dir,
                 frames=frames,
                 selected=selected,
                 chunks=weight_viz.normalize_latent_product_chunks(
-                    recovered["s_only"], squared_e
+                    recovered["CAER"], squared_e
                 ),
                 frame_count=frame_count,
                 output_size=(args.height, args.width),
@@ -254,7 +254,7 @@ def main() -> int:
                 frames=frames,
                 selected=selected,
                 chunks=weight_viz.normalize_latent_product_chunks(
-                    recovered["e_only"], recovered["e_only"]
+                    recovered["MSE"], recovered["MSE"]
                 ),
                 frame_count=frame_count,
                 output_size=(args.height, args.width),

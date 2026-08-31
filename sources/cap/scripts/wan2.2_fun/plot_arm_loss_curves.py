@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Plot CAP arm s_only/uniform losses from TensorBoard event files."""
+"""Plot CAP arm CAER/MSE losses from TensorBoard event files."""
 
 from __future__ import annotations
 
@@ -42,7 +42,7 @@ def first_scalar_event(run_root: Path) -> Path:
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--s-root", type=Path, required=True, help="Arm s_only run directory")
+    parser.add_argument("--s-root", type=Path, required=True, help="Arm caer run directory")
     parser.add_argument("--u-root", type=Path, required=True, help="Arm uniform run directory")
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--start", type=int, default=100)
@@ -63,30 +63,30 @@ def main() -> int:
 
     out = args.output_dir.resolve()
     series = {
-        "s_only": ("s_only weighted_loss", s_weighted_values, (220, 55, 55)),
-        "s_uniform": ("s_only uniform_loss", s_uniform_values, (239, 126, 34)),
-        "u_uniform": ("uniform uniform_loss", u_uniform_values, (45, 105, 205)),
+        "CAER": ("CAER weighted_loss", s_weighted_values, (220, 55, 55)),
+        "CAER_MSE": ("CAER MSE_loss", s_uniform_values, (239, 126, 34)),
+        "MSE": ("MSE loss", u_uniform_values, (45, 105, 205)),
     }
-    draw_chart(out / "01_s_only_two_losses.png", "s_only: weighted loss and uniform loss", [series["s_only"], series["s_uniform"]], 20.0, 101, x_start=start, x_end=end)
-    draw_chart(out / "02_uniform_loss_comparison.png", "uniform loss: s_only vs uniform", [series["s_uniform"], series["u_uniform"]], 20.0, 101, x_start=start, x_end=end)
-    draw_chart(out / "03_all_three_losses.png", "all requested arm losses", [series["s_only"], series["s_uniform"], series["u_uniform"]], 20.0, 101, x_start=start, x_end=end)
+    draw_chart(out / "01_CAER_two_losses.png", "CAER: weighted loss and MSE loss", [series["CAER"], series["CAER_MSE"]], 20.0, 101, x_start=start, x_end=end)
+    draw_chart(out / "02_MSE_loss_comparison.png", "MSE loss: CAER vs MSE", [series["CAER_MSE"], series["MSE"]], 20.0, 101, x_start=start, x_end=end)
+    draw_chart(out / "03_all_two_losses.png", "CAER and MSE losses", [series["CAER"], series["CAER_MSE"], series["MSE"]], 20.0, 101, x_start=start, x_end=end)
     with (out / "loss_curves.csv").open("w", newline="", encoding="utf-8") as handle:
         writer = csv.writer(handle)
-        writer.writerow(["step", "s_only_weighted_loss", "s_only_uniform_loss", "uniform_uniform_loss"])
+        writer.writerow(["step", "caer_weighted_loss", "caer_uniform_loss", "uniform_uniform_loss"])
         for index, step in enumerate(steps.astype(int)):
             writer.writerow([step, s_weighted_values[index], s_uniform_values[index], u_uniform_values[index]])
     metadata = {
-        "s_only_event": str(s_event),
+        "caer_event": str(s_event),
         "uniform_event": str(u_event),
         "steps": [start, end],
         "points_per_series": len(steps),
         "smoothing": {"center": "gaussian", "sigma": 20.0, "envelope": "rolling_quantile_p10_p90", "window": 101},
-        "colors": {"s_only_weighted": "#dc3737", "s_only_uniform": "#ef7e22", "uniform_uniform": "#2d69cd"},
+        "colors": {"caer_weighted": "#dc3737", "caer_uniform": "#ef7e22", "uniform_uniform": "#2d69cd"},
     }
     out.mkdir(parents=True, exist_ok=True)
     (out / "manifest.json").write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
     print(out)
-    print("s_only_event", s_event)
+    print("caer_event", s_event)
     print("uniform_event", u_event)
     print("points", len(steps))
     return 0

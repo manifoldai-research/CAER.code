@@ -1,0 +1,3 @@
+interface:
+  display_name: "CAER World Model Adapter"
+  short_description: "Adapt CAER to action-conditioned world models"

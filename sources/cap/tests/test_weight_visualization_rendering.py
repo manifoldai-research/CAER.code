@@ -19,7 +19,7 @@ import arm_mse_heatmap as weight_viz  # noqa: E402
 
 def load_visualization_module():
     single = types.ModuleType("infer_cap_arm_sample")
-    single.VARIANTS = ("s_only",)
+    single.VARIANTS = ("CAER",)
     batch = types.ModuleType("infer_cap_arm_worldarena_batch")
     with mock.patch.dict(
         sys.modules,
@@ -159,11 +159,11 @@ class WeightVisualizationRenderingTest(unittest.TestCase):
                 blur_radius=12.0,
             )
             weights = {
-                "s_only": np.arange(3 * 8 * 8, dtype=np.float32).reshape(3, 8, 8),
-                "e_only": np.linspace(0.0, 4.0, 3 * 8 * 8, dtype=np.float32).reshape(3, 8, 8),
+                "CAER": np.arange(3 * 8 * 8, dtype=np.float32).reshape(3, 8, 8),
+                "MSE": np.linspace(0.0, 4.0, 3 * 8 * 8, dtype=np.float32).reshape(3, 8, 8),
             }
             original = {mode: values.copy() for mode, values in weights.items()}
-            latent_vmax = {"s_only": 7.5, "e_only": 2.25}
+            latent_vmax = {"CAER": 7.5, "MSE": 2.25}
             frames = {index: np.full((8, 8, 3), 80, dtype=np.uint8) for index in (1, 2)}
             with mock.patch.object(
                 visualization, "read_selected_video_frames", return_value=frames
@@ -176,7 +176,7 @@ class WeightVisualizationRenderingTest(unittest.TestCase):
                     output_dir,
                 )
 
-            for mode, mode_name in (("s_only", "S_only"), ("e_only", "E_only")):
+            for mode, mode_name in (("CAER", "CAER"), ("MSE", "MSE")):
                 spec = report["weights"][mode]
                 self.assertEqual(spec["normalization"]["vmax"], latent_vmax[mode])
                 expected_vmin = weight_viz.episode_response_vmin(

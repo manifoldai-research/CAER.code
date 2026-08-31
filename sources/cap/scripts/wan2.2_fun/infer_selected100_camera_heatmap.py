@@ -255,7 +255,7 @@ def export_heatmaps(
     case_dir.mkdir(parents=True, exist_ok=True)
     report_weights = {}
     rendering = heatmap_rendering_config(args)
-    for mode, mode_name in (("s_only", "S_only"), ("e_only", "E_only")):
+    for mode, mode_name in (("CAER", "CAER"), ("MSE", "MSE")):
         rho = rho_maps[mode]
         latent = rho[0, 0].detach().cpu().numpy().astype(np.float32, copy=False)
         if latent.ndim != 3 or not np.isfinite(latent).all():
@@ -298,7 +298,7 @@ def export_heatmaps(
             artifacts["pngs"] = pngs
         report_weights[mode] = {
             "name": mode_name,
-            "quantity": "S / mean(S)" if mode == "s_only" else "E / mean(E)",
+            "quantity": "S / mean(S)" if mode == "CAER" else "E / mean(E)",
             "array": str(array_path),
             "stats": weight_viz.heatmap_stats(raw),
             "latent_stats": weight_viz.heatmap_stats(latent),
@@ -432,7 +432,7 @@ def infer_case(
         eps=args.eps,
     )
     print(
-        f"case {case['row_index']}: sampling with simultaneous S_only/E_only capture",
+        f"case {case['row_index']}: sampling with simultaneous CAER/MSE capture",
         flush=True,
     )
     with torch.inference_mode(), capture:

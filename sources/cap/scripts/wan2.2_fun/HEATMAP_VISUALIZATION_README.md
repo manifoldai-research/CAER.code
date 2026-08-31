@@ -1,7 +1,7 @@
 # CAP S/E Heatmaps During Inference
 
-This is the canonical handoff document for adding the current `S_only` and
-`E_only` heatmaps to another inference entrypoint. Read this file together
+This is the canonical handoff document for adding the current `CAER` and
+`MSE` heatmaps to another inference entrypoint. Read this file together
 with the following source files before changing an inference script:
 
 1. `scripts/wan2.2_fun/arm_mse_heatmap.py` (formulas, interpolation,
@@ -29,8 +29,8 @@ The model produces a latent prediction and a latent target/noise residual.
 token grid, with the fixed first frame removed:
 
 ```text
-E_only = ||prediction - target||_2 / mean_future(||prediction - target||_2)
-S_only = effect_map / mean_future(effect_map)
+MSE = ||prediction - target||_2 / mean_future(||prediction - target||_2)
+CAER = effect_map / mean_future(effect_map)
 ```
 
 The means are computed per sample/episode over all future latent frames and
@@ -39,7 +39,7 @@ between a conditional transformer forward and a null-condition forward. The
 normalization is not a loss change and must not be written back to model
 weights or NPZ source arrays.
 
-Use `compute_rho_maps(prediction, target, effect_map, ("s_only", "e_only"),
+Use `compute_rho_maps(prediction, target, effect_map, ("CAER", "MSE"),
 exclude_first_frame=True)`. The returned tensor is normally
 `[batch, 1, future_frames, latent_height, latent_width]`. Do not include the
 fixed first frame in the mean.
@@ -54,7 +54,7 @@ pipeline and has generated RGB frames.
 1. Encode the GT target chunk with the same inference VAE used by the
    pipeline.
 2. Create `Method1HeatmapCapture(pipeline, target_latents,
-   ("s_only", "e_only"), sigma=0.5, eps=1e-6)`.
+   ("CAER", "MSE"), sigma=0.5, eps=1e-6)`.
 3. Enter the capture context around the existing `pipeline(...)` call. Do not
    replace or reorder the generation loop:
 
@@ -62,7 +62,7 @@ pipeline and has generated RGB frames.
 capture = weight_viz.Method1HeatmapCapture(
     pipeline,
     target_latents,
-    ("s_only", "e_only"),
+    ("CAER", "MSE"),
     sigma=0.5,
     eps=1e-6,
 )
@@ -99,7 +99,7 @@ LIBERO, use the existing action/mask and reference-latent construction in
 ## Canonical PNG Rendering
 
 The current renderer is deliberately episode-local and has one shared scale
-per weight type. For each `S_only` or `E_only` map:
+per weight type. For each `CAER` or `MSE` map:
 
 1. Apply `smooth_latent_spatially(latent, sigma=1.5)` independently in space
    for each latent frame. Never smooth across time and never modify the saved
@@ -171,13 +171,13 @@ Use the existing per-case layout; do not create GIFs:
 <output-dir>/
   selection.json                 # random seed and selected IDs, if sampling
   case_<id>_<name>/
-    S_only_weights.npz           # raw rendered rho; never display-smoothed/rescaled
-    E_only_weights.npz
-    S_only/frame_0004.png
-    S_only/frame_0008.png
+    CAER_weights.npz             # raw rendered rho; never display-smoothed/rescaled
+    MSE_weights.npz
+    CAER/frame_0004.png
+    CAER/frame_0008.png
     ...
-    E_only/frame_0004.png
-    E_only/frame_0008.png
+    MSE/frame_0004.png
+    MSE/frame_0008.png
     ...
     manifest.json
   manifest.json                  # root manifest listing all cases
@@ -254,7 +254,7 @@ render all PNGs with that scale.
 
 Before reporting success, check all of the following:
 
-- `rho` contains both `s_only` and `e_only`, and both exclude the fixed first
+- `rho` contains both `caer` and `mse`, and both exclude the fixed first
   frame in their means.
 - The latent NPZ is finite and unchanged by display smoothing.
 - Every episode/weight has exactly one latent positive P99 `vmax`.
@@ -290,11 +290,11 @@ For a generated-video inference entrypoint, use
 `Method1HeatmapCapture` context around the existing pipeline call. The
 dataset README remains authoritative for how to locate RGB, skeleton, action,
 annotation, and instruction files; this README is authoritative only for the
-S/E diagnostic and rendering contract.
+CAER/MSE diagnostic and rendering contract.
 
 ## Full GT MP4 Export
 
-`visualize_cap_gt_videos.py` writes `S_only.mp4` and `E_only.mp4` for every
+`visualize_cap_gt_videos.py` writes `CAER.mp4` and `MSE.mp4` for every
 case. It renders all 17 sampled GT frames at `1280x704` and 8 FPS. Pass the
 previous `gt_weight_visualization_random10` directory as `--existing-dir` to
 reuse its saved NPZ maps, then set `--sample-count 20` to append ten new cases:
@@ -312,7 +312,7 @@ python sources/cap/scripts/wan2.2_fun/visualize_cap_gt_videos.py \
 
 The output root manifest records all 20 IDs and each case manifest records
 the two MP4 paths. These videos use GT RGB backgrounds with the fixed-sigma
-diagnostic S/E maps; they are not diffusion-generated RGB videos.
+diagnostic CAER/MSE maps; they are not diffusion-generated RGB videos.
 
 ## Prompt For Another Codex
 
@@ -326,7 +326,7 @@ Read these files completely before editing:
 - sources/cap/scripts/wan2.2_fun/visualize_cap_arm_weights.py
 - the dataset/model README used by this inference entrypoint
 
-Incrementally add simultaneous S_only/E_only heatmap capture and PNG export
+Incrementally add simultaneous CAER/MSE heatmap capture and PNG export
 to the existing inference flow. Reuse arm_mse_heatmap.py; do not rewrite the
 formulas or renderer, and do not change model inference, loss, checkpoint
 weights, or generated RGB outputs. Preserve the host script's episode/case

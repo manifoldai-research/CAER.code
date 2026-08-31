@@ -762,9 +762,9 @@ def parse_args():
     parser.add_argument(
         "--method1_loss_variant",
         type=str,
-        default="s_max1",
+        default="CAER",
         choices=METHOD1_LOSS_VARIANTS,
-        help="Method1 weighting variant. LIBERO s_max1 uses rho=max(S/mean_future(S), 1).",
+        help="Method1 weighting variant. LIBERO CAER uses rho=max(S/mean_future(S), 1).",
     )
     parser.add_argument(
         "--method1_action_dropout_prob",
@@ -2713,11 +2713,7 @@ def main():
                 method1_active_mask = None
                 method1_main_arm_action_mask = arm_action_mask
                 if args.enable_method1_focused_loss:
-                    method1_requires_effect_map = args.method1_loss_variant in {
-                        "s_only",
-                        "s_max1",
-                        "current",
-                    }
+                    method1_requires_effect_map = args.method1_loss_variant == "CAER"
                     if arm_action_values is None:
                         raise RuntimeError(
                             "Method1 focused loss requires arm_action_values in every LIBERO batch"
