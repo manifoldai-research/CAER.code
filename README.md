@@ -13,6 +13,10 @@ or dropped-control condition.
 
 ![CAER overview](assets/teaser.png)
 
+## 📰 News
+
+- **[2026.09.01]** 🎉 We released the [CAER paper](https://arxiv.org/abs/2608.30897), [project page](https://manifoldai-research.github.io/CAER/), and [source code](https://github.com/manifoldai-research/CAER.code).
+
 ## Adapt CAER to your own world model
 
 This repository ships a reusable coding-agent skill at
