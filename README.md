@@ -19,6 +19,11 @@ or dropped-control condition.
 
 ## Adapt CAER to your own world model
 
+```bash
+git clone https://github.com/manifoldai-research/CAER.code.git
+cd CAER.code
+```
+
 This repository ships a reusable coding-agent skill at
 [`skills/caer-world-model-adapter/SKILL.md`](skills/caer-world-model-adapter/SKILL.md).
 After cloning, point an agent at that file with a request such as:
