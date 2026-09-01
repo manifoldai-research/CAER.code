@@ -1,6 +1,8 @@
-# CAER
+<h1 align="center" style="font-size: 48px;">CAER: Causal Action Effect Reweighting for World Model Training</h1>
 
-**Causal Action Effect Reweighting for action-conditioned world models**
+[![License](https://img.shields.io/badge/License-Apache%202.0-3a3a3a?labelColor=blue)](https://opensource.org/licenses/Apache-2.0)
+[![Project Page](https://img.shields.io/badge/Project-Page-3a3a3a?logo=googlechrome&logoColor=white&labelColor=blue)](https://manifoldai-research.github.io/CAER/)
+[![arXiv](https://img.shields.io/badge/arXiv-2608.30897-3a3a3a?logo=arxiv&logoColor=white&labelColor=b31b1b)](https://arxiv.org/abs/2608.30897)
 
 CAER is an annotation-free training objective that measures which predicted
 future tokens are causally sensitive to an action, then reallocates a fixed
@@ -116,12 +118,11 @@ hard-code private filesystem locations into scripts or documentation.
 ## Citation
 
 ```bibtex
-@article{fang2026caer,
+@article{caer,
   title   = {CAER: Causal Action Effect Reweighting for World Model Training},
-  author  = {Fang, Jianjie and Liu, Xvyuan and Wang, Ziyou and Tang, Rongze
-             and Wang, Zhaolu and Li, Zhuohang and Zhang, Xin and Su, Haisheng
-             and Gao, Chen and Wu, Wei and Chen, Xinlei and Li, Yong},
-  year    = {2026}
+  author  = {Jianjie Fang and Xvyuan Liu and Ziyou Wang and Rongze Tang and Zhaolu Wang and Zhuohang Li and Xin Zhang and Haisheng Su and Chen Gao and Wei Wu and Xinlei Chen and Yong Li},
+  year    = {2026},
+  url     = {https://arxiv.org/abs/2608.30897}
 }
 ```
 
