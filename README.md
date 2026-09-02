@@ -73,11 +73,9 @@ The command-line vocabulary is deliberately small:
 | Name | Meaning |
 | --- | --- |
 | `MSE` | Original unweighted mean-squared-error baseline. |
-| `CAER` | Action-effect weighting. CAP uses normalized effect; LIBERO keeps its validated lower-clamped effect policy. |
+| `CAER` | Causal action-effect reweighting using detached, per-sample normalized effect weights. |
 
-Use `CAER` for the method described in the paper. The implementation-specific
-policy is selected inside each validated training entry point; users do not
-need to know legacy ablation labels.
+Use `CAER` for the method described in the paper. All validated training entry points use the same normalized action-effect weighting described above.
 
 ## Reproduce the included experiments
 
