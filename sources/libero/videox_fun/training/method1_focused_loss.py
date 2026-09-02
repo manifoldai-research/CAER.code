@@ -71,16 +71,10 @@ def method1_focused_flow_loss(
             )
         if not bool(torch.isfinite(effect_f).all()):
             raise ValueError("effect_map contains non-finite values")
-
-        effect_mean = _future_mean(effect_f, exclude_first_frame)
-        s_hat = effect_f / effect_mean.clamp_min(float(eps))
-        caer = torch.maximum(s_hat, torch.ones_like(s_hat))
-        caer = torch.where(
-            effect_mean > float(eps),
-            caer,
-            torch.ones_like(caer),
-        )
-        rho = caer.detach()
+        
+        rho = _normalize_token_map(
+            effect_f, eps, exclude_first_frame
+        ).detach()
 
     if active_mask is not None:
         rho = torch.where(
